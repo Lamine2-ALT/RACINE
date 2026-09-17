@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mini-Fiches · Les Racines Carrées · 3ᵉ</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Space+Mono:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
+<style>
+:root{
+  --paper:#F6F1E5; --paper2:#FCF9F1; --ink:#191712; --ink2:#5D5546;
+  --yellow:#F2B705; --danger:#C8371F; --ok:#1D7A46;
+  --disp:'Bricolage Grotesque',sans-serif;
+  --body:'Instrument Sans',system-ui,sans-serif;
+  --mono:'Space Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-snap-type:y proximity}
+body{background:#14110a;font-family:var(--body);color:var(--ink);overflow-x:hidden}
+::selection{background:var(--yellow);color:var(--ink)}
+
+/* ---------- ambiance ---------- */
+.bg-noise{position:fixed;inset:0;pointer-events:none;z-index:40;opacity:.06;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E")}
+.floaters{position:fixed;inset:0;pointer-events:none;z-index:0}
+.floaters span{position:absolute;font-family:var(--disp);font-weight:800;color:rgba(246,241,229,.055);animation:drift 16s ease-in-out infinite alternate}
+.floaters span:nth-child(1){font-size:220px;top:6%;left:4%}
+.floaters span:nth-child(2){font-size:130px;top:30%;right:6%;animation-duration:21s}
+.floaters span:nth-child(3){font-size:170px;top:58%;left:8%;animation-duration:13s}
+.floaters span:nth-child(4){font-size:110px;top:80%;right:12%;animation-duration:18s}
+.floaters span:nth-child(5){font-size:150px;top:44%;left:44%;animation-duration:24s}
+@keyframes drift{from{transform:translateY(-18px) rotate(-4deg)}to{transform:translateY(22px) rotate(5deg)}}
+
+/* ---------- UI fixe ---------- */
+.progress{position:fixed;top:0;left:0;height:3px;width:100%;z-index:60;background:rgba(246,241,229,.12)}
+.progress i{display:block;height:100%;width:0;background:var(--yellow);transition:width .15s linear}
+.hud{position:fixed;top:14px;left:14px;z-index:60;display:flex;gap:8px;align-items:center;
+ background:rgba(20,17,10,.82);border:1px solid rgba(246,241,229,.22);color:var(--paper);
+ font:700 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;padding:8px 13px;border-radius:999px;backdrop-filter:blur(4px)}
+.hud-dot{width:9px;height:9px;border-radius:50%;background:var(--yellow);transition:background .4s}
+.rail{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:7px}
+.rail a{width:7px;height:7px;border-radius:2px;background:rgba(246,241,229,.26);transform:rotate(45deg);transition:.3s;position:relative}
+.rail a:hover{background:rgba(246,241,229,.7)}
+.rail a.on{background:var(--pc);transform:rotate(45deg) scale(1.7);box-shadow:0 0 12px var(--pc)}
+.rail a::after{content:attr(data-tip);position:absolute;right:20px;top:50%;transform:translateY(-50%) translateX(6px);
+ white-space:nowrap;font:700 9px var(--mono);letter-spacing:.1em;color:var(--paper);background:rgba(20,17,10,.9);
+ border:1px solid rgba(246,241,229,.25);padding:5px 9px;border-radius:6px;opacity:0;pointer-events:none;transition:.25s}
+.rail a:hover::after{opacity:1;transform:translateY(-50%) translateX(0)}
+.arrows{position:fixed;bottom:18px;right:16px;z-index:60;display:flex;flex-direction:column;gap:8px}
+.arrows button{width:44px;height:44px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);
+ font-size:18px;cursor:pointer;box-shadow:3px 3px 0 rgba(0,0,0,.5);transition:.2s}
+.arrows button:hover{background:var(--yellow);transform:translateY(-2px)}
+.arrows button:active{transform:translateY(1px);box-shadow:1px 1px 0 rgba(0,0,0,.5)}
+
+/* ---------- pages 9:16 ---------- */
+main{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:28px;padding:74px 12px 96px}
+.page{width:min(442px,94vw);aspect-ratio:9/16;position:relative;scroll-snap-align:center;flex:none}
+.card{position:absolute;inset:0;background:var(--paper);border:2px solid #0b0a07;border-radius:22px;
+ box-shadow:0 26px 60px rgba(0,0,0,.55);overflow-y:auto;scrollbar-width:none;display:flex}
+.card::-webkit-scrollbar{display:none}
+.card::before{content:'';position:absolute;inset:0;pointer-events:none;
+ background-image:linear-gradient(rgba(25,23,18,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(25,23,18,.05) 1px,transparent 1px);
+ background-size:23px 23px}
+.card-in{position:relative;padding:20px 20px 14px;display:flex;flex-direction:column;gap:13px;flex:1;width:100%}
+.ctag{position:absolute;top:15px;right:-9px;z-index:5;font:700 10px var(--mono);letter-spacing:.16em;
+ background:var(--acc,var(--yellow));color:#fff;padding:6px 11px;border-radius:6px;transform:rotate(5deg);
+ border:2px solid var(--ink);box-shadow:2px 3px 0 rgba(0,0,0,.25)}
+
+/* accents par fiche */
+.f1{--acc:#2C4BE0;--acc-soft:#DCE3FF}
+.f2{--acc:#0E8A5F;--acc-soft:#D9F0E4}
+.f3{--acc:#D7401F;--acc-soft:#FBDFD7}
+.f4{--acc:#6C3FD1;--acc-soft:#E9E0FB}
+.f5{--acc:#0B7285;--acc-soft:#D8EEF2}
+
+/* apparitions */
+.rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease var(--d,0s),transform .65s cubic-bezier(.2,.7,.2,1) var(--d,0s)}
+.page.live .rv{opacity:1;transform:none}
+
+/* ---------- typographie ---------- */
+.eyebrow{display:flex;align-items:center;gap:8px;font:700 10px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+.eyebrow::before{content:'';width:9px;height:9px;background:var(--acc);border-radius:2px;transform:rotate(45deg)}
+.ptype{font-family:var(--disp);font-weight:800;font-size:clamp(29px,8vw,38px);line-height:1.02;letter-spacing:-.01em}
+.ptype .u{background:linear-gradient(transparent 64%,var(--acc-soft) 64%)}
+.ptype .warn-u{background:linear-gradient(transparent 64%,#FBDFD7 64%)}
+.sub{font-size:13px;line-height:1.55;color:var(--ink2)}
+.katex{font-size:1.06em}
+
+/* blocs découverte */
+.def{background:#fff;border:2px solid var(--ink);border-radius:14px;padding:14px 15px;box-shadow:4px 4px 0 var(--acc-soft);font-size:13.5px;line-height:1.6}
+.def .tag{display:inline-block;font:700 9.5px var(--mono);letter-spacing:.14em;background:var(--acc);color:#fff;padding:4px 8px;border-radius:6px;margin-bottom:8px}
+.exemple{background:var(--acc-soft);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6}
+.exemple .tag{font:700 9.5px var(--mono);letter-spacing:.14em;color:var(--acc);display:block;margin-bottom:5px}
+.note{font-size:12.5px;line-height:1.55;background:rgba(25,23,18,.06);border-left:3px solid var(--acc);border-radius:0 10px 10px 0;padding:9px 12px}
+
+/* je retiens */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.memocard{background:#fff;border:2px solid var(--ink);border-radius:14px;padding:13px 12px;text-align:center;
+ box-shadow:4px 4px 0 var(--acc-soft);transition:.25s}
+.memocard:hover{transform:translate(-2px,-3px) rotate(-.6deg);box-shadow:7px 7px 0 var(--acc-soft)}
+.memocard .fx{min-height:44px;display:grid;place-items:center}
+.memocard small{display:block;margin-top:7px;font-size:11px;line-height:1.45;color:var(--ink2)}
+.chain{display:flex;flex-wrap:wrap;gap:5px;align-items:center;justify-content:center;background:var(--ink);border-radius:14px;padding:14px 12px}
+.chain .ens{font:700 14px var(--mono);color:var(--paper);border:1.5px solid rgba(246,241,229,.4);padding:5px 9px;border-radius:8px;background:rgba(255,255,255,.07);transition:.2s}
+.chain .ens:hover{transform:translateY(-3px);border-color:var(--yellow)}
+.chain .sub-s{color:var(--yellow);font:700 13px var(--mono)}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:11.5px;color:var(--ink2)}
+.legend b{color:var(--ink);font-family:var(--mono);font-size:11px}
+.props{display:flex;flex-direction:column;gap:9px}
+.prop{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--ink);border-radius:12px;padding:9px 12px;box-shadow:3px 3px 0 var(--acc-soft);transition:.2s}
+.prop:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--acc-soft)}
+.prop .lbl{font:700 9px var(--mono);letter-spacing:.1em;background:var(--acc);color:#fff;padding:4px 6px;border-radius:6px;min-width:72px;text-align:center;flex:none}
+.prop .fx{flex:1;text-align:center}
+.regle{background:var(--ink);color:var(--paper);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6}
+.regle strong{color:var(--yellow)}
+.meth{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1.5px solid var(--ink);border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.55;box-shadow:3px 3px 0 var(--acc-soft)}
+.meth .n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;display:grid;place-items:center;font:800 13px var(--disp)}
+
+/* piège */
+.hazard{height:12px;flex:none;background:repeating-linear-gradient(-45deg,var(--ink) 0 12px,var(--yellow) 12px 24px)}
+.vs{position:relative;display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.stamp{position:absolute;top:-16px;right:6px;z-index:2;background:var(--danger);color:#fff;font:800 12px var(--disp);
+ letter-spacing:.22em;padding:6px 13px;border-radius:6px;transform:rotate(6deg);box-shadow:3px 3px 0 rgba(0,0,0,.25)}
+.bad,.good{border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6}
+.bad{background:#FCE7E1;border:2px solid var(--danger)}
+.good{background:#E9F4EC;border:2px solid var(--ok)}
+.bad .t,.good .t{display:block;font:800 10.5px var(--mono);letter-spacing:.14em;margin-bottom:6px}
+.bad .t{color:var(--danger)} .good .t{color:var(--ok)}
+
+/* quiz */
+.quiz-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.qcount{font:700 10px var(--mono);letter-spacing:.1em;background:var(--acc);color:#fff;padding:6px 11px;border-radius:999px}
+.allbtn{font:700 10px var(--mono);letter-spacing:.08em;background:transparent;border:1.5px solid var(--ink);border-radius:999px;
+ padding:7px 13px;cursor:pointer;transition:.2s;box-shadow:2px 2px 0 var(--ink)}
+.allbtn:hover{background:var(--yellow);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+.q{background:var(--paper2);border:1.5px solid rgba(25,23,18,.2);border-radius:13px;padding:11px 13px;display:flex;flex-direction:column;gap:8px;transition:border-color .25s}
+.q:hover{border-color:var(--acc)}
+.q-top{display:flex;gap:10px;align-items:flex-start}
+.qn{flex:none;width:27px;height:27px;background:var(--acc);color:#fff;font:700 11.5px var(--mono);display:grid;place-items:center;border-radius:8px;transform:rotate(-5deg);transition:.25s}
+.q:hover .qn{transform:rotate(0) scale(1.08)}
+.q-txt{font-size:13px;line-height:1.55;padding-top:2px}
+.rev{align-self:flex-start;font:700 10px var(--mono);letter-spacing:.08em;background:transparent;border:1.5px solid var(--ink);
+ border-radius:999px;padding:6px 13px;cursor:pointer;transition:.2s;box-shadow:2px 2px 0 var(--ink)}
+.rev:hover{background:var(--yellow);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+.rev:active{transform:translate(1px,1px);box-shadow:0 0 0 var(--ink)}
+.ans{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s cubic-bezier(.2,.7,.2,1)}
+.q.open .ans{grid-template-rows:1fr}
+.ans>div{overflow:hidden}
+.ans-in{margin-top:2px;border:1.5px dashed var(--ok);background:#E9F4EC;border-radius:10px;padding:9px 12px;font-size:12.5px;line-height:1.6;display:flex;gap:8px}
+.ans-in::before{content:'✓';font-weight:800;color:var(--ok);flex:none}
+
+/* tuiles fiche 5 */
+.tuiles{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.tuile{background:#fff;border:1.5px solid var(--ink);border-radius:10px;padding:8px 3px;text-align:center;transition:.2s}
+.tuile:hover{transform:translateY(-3px);background:var(--acc-soft)}
+.tuile b{font:800 15px var(--disp)}
+.tuile span{display:block;font:400 8.5px var(--mono);color:var(--ink2);margin-top:4px;line-height:1.35}
+
+/* footer de page */
+.pfoot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;border-top:1.5px dashed rgba(25,23,18,.3);padding-top:10px}
+.src{font:400 9px var(--mono);color:var(--ink2);letter-spacing:.05em}
+.pdots{display:flex;gap:7px}
+.pdots i{width:8px;height:8px;border-radius:2px;background:rgba(25,23,18,.14);transform:rotate(45deg);transition:.3s}
+.pdots i.on{background:var(--acc);transform:rotate(45deg) scale(1.3)}
+
+/* ---------- couverture ---------- */
+.cover .card{background:var(--ink);color:var(--paper);overflow:hidden}
+.cover .card::before{background-image:linear-gradient(rgba(246,241,229,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(246,241,229,.06) 1px,transparent 1px)}
+.cover .wm{position:absolute;bottom:-150px;right:-70px;font:800 520px/1 var(--disp);color:transparent;-webkit-text-stroke:2px rgba(246,241,229,.1);pointer-events:none}
+.cover-top{font:700 10px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:rgba(246,241,229,.75);display:flex;flex-wrap:wrap;gap:6px}
+.cover-top em{font-style:normal;color:var(--yellow)}
+.radical{width:150px;margin:4px 0 0}
+.radical path{fill:none;stroke:var(--yellow);stroke-width:13;stroke-linecap:round;stroke-linejoin:round;
+ stroke-dasharray:470;stroke-dashoffset:470;animation:draw 1.3s ease .3s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.cover h1{font:800 clamp(46px,13.5vw,64px)/0.95 var(--disp);letter-spacing:-.02em}
+.cover h1 span{color:var(--yellow)}
+.cover-sub{font-size:13px;line-height:1.6;color:rgba(246,241,229,.8);max-width:34ch}
+.sommaire{display:flex;flex-direction:column;margin-top:2px}
+.sommaire a{display:flex;gap:12px;align-items:center;padding:9px 4px;border-bottom:1.5px dashed rgba(246,241,229,.28);
+ color:var(--paper);text-decoration:none;font-weight:600;font-size:13.5px;transition:.22s}
+.sommaire a i{flex:none;font:700 11px var(--mono);font-style:normal;color:var(--yellow);width:30px;height:30px;
+ border:1.5px solid var(--yellow);border-radius:8px;display:grid;place-items:center;transition:.22s}
+.sommaire a:hover{padding-left:12px;color:var(--yellow)}
+.sommaire a:hover i{background:var(--yellow);color:var(--ink);transform:rotate(-7deg)}
+.cover-foot{margin-top:auto;font:700 9.5px var(--mono);letter-spacing:.1em;color:rgba(246,241,229,.65);text-transform:uppercase;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.credit{font:400 9px var(--mono);color:rgba(246,241,229,.5);letter-spacing:.06em}
+.hint{text-align:center;color:rgba(246,241,229,.7);font-size:17px;animation:bob 1.5s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+/* ---------- page finale ---------- */
+.end .card{background:var(--yellow)}
+.end .ptype{font-size:clamp(34px,10vw,46px)}
+.stars{display:flex;gap:8px;font-size:34px}
+.stars span{display:inline-block;opacity:0;transform:scale(.3) rotate(-30deg)}
+.page.live .stars span{animation:pop .5s cubic-bezier(.3,1.6,.5,1) forwards}
+.stars span:nth-child(1){animation-delay:.15s}.stars span:nth-child(2){animation-delay:.3s}
+.stars span:nth-child(3){animation-delay:.45s}.stars span:nth-child(4){animation-delay:.6s}.stars span:nth-child(5){animation-delay:.75s}
+@keyframes pop{to{opacity:1;transform:none}}
+.bareme{background:var(--paper);border:2px solid var(--ink);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:13px;line-height:1.55;box-shadow:4px 4px 0 rgba(0,0,0,.25)}
+.bareme b{font-family:var(--disp)}
+.restart{display:inline-block;align-self:flex-start;font:800 15px var(--disp);background:var(--ink);color:var(--yellow);
+ text-decoration:none;padding:13px 22px;border-radius:999px;transition:.2s;box-shadow:4px 4px 0 rgba(0,0,0,.3)}
+.restart:hover{transform:translate(-2px,-2px) rotate(-1deg);box-shadow:7px 7px 0 rgba(0,0,0,.3)}
+
+@media (max-width:760px){.rail{display:none}}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none}
+  .radical path{stroke-dashoffset:0}
+  .stars span{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-noise" aria-hidden="true"></div>
+<div class="floaters" aria-hidden="true"><span>√</span><span>π</span><span>x²</span><span>±</span><span>ℝ</span></div>
+<div class="progress"><i id="pbar"></i></div>
+<header class="hud"><span class="hud-dot"></span><span id="hudText">Couverture</span></header>
+
+<nav class="rail" aria-label="Sommaire des pages">
+  <a href="#p0" data-tip="Couverture" style="--pc:#F2B705"></a>
+  <a href="#f1p1" data-tip="F1 · Je découvre" style="--pc:#2C4BE0"></a><a href="#f1p2" data-tip="F1 · Je retiens" style="--pc:#2C4BE0"></a><a href="#f1p3" data-tip="F1 · Le piège" style="--pc:#2C4BE0"></a><a href="#f1p4" data-tip="F1 · Mini-quiz" style="--pc:#2C4BE0"></a>
+  <a href="#f2p1" data-tip="F2 · Je découvre" style="--pc:#0E8A5F"></a><a href="#f2p2" data-tip="F2 · Je retiens" style="--pc:#0E8A5F"></a><a href="#f2p3" data-tip="F2 · Le piège" style="--pc:#0E8A5F"></a><a href="#f2p4" data-tip="F2 · Mini-quiz" style="--pc:#0E8A5F"></a>
+  <a href="#f3p1" data-tip="F3 · Je découvre" style="--pc:#D7401F"></a><a href="#f3p2" data-tip="F3 · Je retiens" style="--pc:#D7401F"></a><a href="#f3p3" data-tip="F3 · Le piège" style="--pc:#D7401F"></a><a href="#f3p4" data-tip="F3 · Mini-quiz" style="--pc:#D7401F"></a>
+  <a href="#f4p1" data-tip="F4 · Je découvre" style="--pc:#6C3FD1"></a><a href="#f4p2" data-tip="F4 · Je retiens" style="--pc:#6C3FD1"></a><a href="#f4p3" data-tip="F4 · Le piège" style="--pc:#6C3FD1"></a><a href="#f4p4" data-tip="F4 · Mini-quiz" style="--pc:#6C3FD1"></a>
+  <a href="#f5p1" data-tip="F5 · Je découvre" style="--pc:#0B7285"></a><a href="#f5p2" data-tip="F5 · Je retiens" style="--pc:#0B7285"></a><a href="#f5p3" data-tip="F5 · Le piège" style="--pc:#0B7285"></a><a href="#f5p4" data-tip="F5 · Mini-quiz" style="--pc:#0B7285"></a>
+  <a href="#pend" data-tip="Barème" style="--pc:#F2B705"></a>
+</nav>
+
+<div class="arrows">
+  <button id="prev" aria-label="Page précédente">↑</button>
+  <button id="next" aria-label="Page suivante">↓</button>
+</div>
+
+<main id="deck">
+
+<!-- ═══════════ COUVERTURE ═══════════ -->
+<section class="page cover" id="p0" data-hud="Couverture">
+  <div class="card"><div class="wm">√</div><div class="card-in">
+    <p class="cover-top rv">Mini-Fiches de Découverte <em>· 3ᵉ · Activités numériques</em></p>
+    <svg class="radical rv" style="--d:.1s" viewBox="0 0 300 240" aria-hidden="true">
+      <path d="M18 128 L64 152 L118 214 L196 30 L288 30"/>
+    </svg>
+    <h1 class="rv" style="--d:.2s">Les Racines<br><span>Carrées</span></h1>
+    <p class="cover-sub rv" style="--d:.3s">Savoir ce qu'est $\sqrt{a}$, classer les nombres, simplifier, rationaliser, comparer et encadrer.</p>
+    <ol class="sommaire rv" style="--d:.4s;list-style:none">
+      <li><a href="#f1p1"><i>01</i>Définition &amp; notation de $\sqrt{a}$</a></li>
+      <li><a href="#f2p1"><i>02</i>Rationnels, irrationnels &amp; $\mathbb{R}$</a></li>
+      <li><a href="#f3p1"><i>03</i>Propriétés &amp; pièges à éviter</a></li>
+      <li><a href="#f4p1"><i>04</i>Simplification &amp; conjugué</a></li>
+      <li><a href="#f5p1"><i>05</i>Comparaison, valeur absolue, encadrement</a></li>
+    </ol>
+    <div class="cover-foot rv" style="--d:.5s">
+      <span>Je découvre → Je retiens → Le piège → Mini-quiz</span>
+      <span class="credit">M. L. Wade</span>
+    </div>
+    <p class="hint" aria-hidden="true">▼</p>
+  </div></div>
+</section>
+
+<!-- ═══════════ FICHE 1 ═══════════ -->
+<section class="page f1" id="f1p1" data-hud="Fiche 1 · 1/4 · Je découvre">
+  <div class="ctag">FICHE 01</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 01 · Définition &amp; notation de $\sqrt{a}$</p>
+    <h2 class="ptype rv" style="--d:.05s">Je <span class="u">découvre</span></h2>
+    <div class="def rv" style="--d:.15s">
+      <span class="tag">DÉFINITION</span>
+      Soit $a$ un nombre <b>positif ou nul</b>. La <b>racine carrée</b> de $a$ est l'unique nombre <b>positif ou nul</b> dont le carré est égal à $a$. On le note $\sqrt{a}$.
+    </div>
+    <div class="exemple rv" style="--d:.25s">
+      <span class="tag">EXEMPLE</span>
+      $\sqrt{25} = 5$, car $5 \geqslant 0$ et $5^2 = 25$.
+    </div>
+    <p class="note rv" style="--d:.35s">Le nombre sous le radical doit être positif ou nul : $\sqrt{-4}$ n'existe pas dans $\mathbb{R}$.</p>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i class="on"></i><i></i><i></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f1" id="f1p2" data-hud="Fiche 1 · 2/4 · Je retiens">
+  <div class="ctag">FICHE 01</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 01 · Définition &amp; notation de $\sqrt{a}$</p>
+    <h2 class="ptype rv" style="--d:.05s">Je <span class="u">retiens</span></h2>
+    <p class="sub rv" style="--d:.1s">Pour tout réel $a \geqslant 0$, deux conséquences directes de la définition :</p>
+    <div class="duo rv" style="--d:.2s">
+      <div class="memocard"><div class="fx">$\sqrt{a}\geqslant 0$</div><small>Une racine carrée est toujours <b>positive ou nulle</b>.</small></div>
+      <div class="memocard"><div class="fx">$(\sqrt{a})^2 = a$</div><small>La racine « annule » le carré.</small></div>
+    </div>
+    <div class="exemple rv" style="--d:.3s">
+      <span class="tag">VÉRIFIONS</span>
+      $\sqrt{25}=5$ car $5\geqslant 0$ et $5^2=25$ ✓ &nbsp;·&nbsp; $(\sqrt{7})^2 = 7$ ✓
+    </div>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i></i><i class="on"></i><i></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f1" id="f1p3" data-hud="Fiche 1 · 3/4 · Le piège">
+  <div class="ctag" style="background:#C8371F">⚠ PIÈGE</div>
+  <div class="card"><div class="hazard"></div><div class="card-in">
+    <p class="eyebrow rv">Fiche 01 · Définition &amp; notation de $\sqrt{a}$</p>
+    <h2 class="ptype rv" style="--d:.05s">Le piège <span class="warn-u">classique</span></h2>
+    <div class="vs rv" style="--d:.15s">
+      <span class="stamp">PIÈGE !</span>
+      <div class="bad"><span class="t">✗ FAUX — $\sqrt{a}$ n'est jamais « ± quelque chose »</span>
+        $\sqrt{16} = \pm 4$ &nbsp;?&nbsp; Non : $-4$ est négatif, donc <b>exclu</b>. On a seulement $\sqrt{16}=4$.</div>
+      <div class="good"><span class="t">✓ VRAI — l'équation, elle, a deux solutions</span>
+        L'équation $x^2 = 16$ admet deux solutions : $x = 4$ <b>et</b> $x = -4$.</div>
+    </div>
+    <p class="regle rv" style="--d:.3s"><strong>À retenir :</strong> la racine carrée désigne <b>l'unique</b> nombre positif dont le carré vaut $a$. Le « $\pm$ » apparaît seulement quand on <b>résout</b> $x^2 = a$.</p>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i></i><i></i><i class="on"></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f1" id="f1p4" data-hud="Fiche 1 · 4/4 · Mini-quiz">
+  <div class="ctag">FICHE 01</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 01 · Définition &amp; notation de $\sqrt{a}$</p>
+    <h2 class="ptype rv" style="--d:.05s">Mini-<span class="u">quiz</span> 1</h2>
+    <div class="quiz-top rv" style="--d:.1s">
+      <span class="qcount">5 QUESTIONS · 1 PT CHACUNE</span>
+      <button class="allbtn" data-on="0">Tout afficher</button>
+    </div>
+    <div class="q rv" style="--d:.15s"><div class="q-top"><span class="qn">Q1</span><p class="q-txt">Complète : $\sqrt{36}=\ldots$ car $\ldots^2=36$ et ce nombre est positif.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$\sqrt{36}=6$, car $6^2=36$ et $6\geqslant 0$.</p></div></div></div>
+    <div class="q rv" style="--d:.2s"><div class="q-top"><span class="qn">Q2</span><p class="q-txt">Calcule : $(\sqrt{7})^2$.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$(\sqrt{7})^2 = 7$ (propriété : $(\sqrt{a})^2 = a$).</p></div></div></div>
+    <div class="q rv" style="--d:.25s"><div class="q-top"><span class="qn">Q3</span><p class="q-txt">Vrai ou Faux : $\sqrt{16}=\pm 4$ ? Justifie.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in"><b>Faux.</b> $\sqrt{16}=4$ uniquement : la racine carrée d'un nombre positif est toujours positive ou nulle. (C'est l'équation $x^2=16$ qui a deux solutions : $4$ et $-4$.)</p></div></div></div>
+    <div class="q rv" style="--d:.3s"><div class="q-top"><span class="qn">Q4</span><p class="q-txt">Calcule : $\sqrt{0}$ et $\sqrt{1}$.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$\sqrt{0}=0$ et $\sqrt{1}=1$.</p></div></div></div>
+    <div class="q rv" style="--d:.35s"><div class="q-top"><span class="qn">Q5</span><p class="q-txt">Anticipe : que vaut $\sqrt{(-9)^2}$ ? (Indice : fiche 5, $\sqrt{a^2}=\lvert a\rvert$.)</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$\sqrt{(-9)^2}=\sqrt{81}=9$. Règle générale : $\sqrt{a^2}=\lvert a\rvert$.</p></div></div></div>
+    <div class="pfoot"><span class="src">Objectif : 5/5</span><span class="pdots"><i></i><i></i><i></i><i class="on"></i></span></div>
+  </div></div>
+</section>
+
+<!-- ═══════════ FICHE 2 ═══════════ -->
+<section class="page f2" id="f2p1" data-hud="Fiche 2 · 1/4 · Je découvre">
+  <div class="ctag">FICHE 02</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 02 · Rationnels, irrationnels &amp; $\mathbb{R}$</p>
+    <h2 class="ptype rv" style="--d:.05s">Je <span class="u">découvre</span></h2>
+    <div class="duo rv" style="--d:.15s">
+      <div class="def"><span class="tag">RATIONNELS ℚ</span>S'écrivent comme fraction $\dfrac{a}{b}$ :<br>$5$ ; $-\dfrac{1}{2}$ ; $6{,}4$ ; $\sqrt{16}=4$.</div>
+      <div class="def"><span class="tag">IRRATIONNELS</span>Ne s'écrivent <b>pas</b> en fraction :<br>$\sqrt{3}$ ; $-\sqrt{8}$ ; $\pi$.<br>Décimale <b>infinie non périodique</b>.</div>
+    </div>
+    <p class="note rv" style="--d:.25s">Rationnels et irrationnels forment ensemble l'ensemble des <b>nombres réels</b> $\mathbb{R}$.</p>
+    <div class="exemple rv" style="--d:.35s">
+      <span class="tag">COMMENT CLASSER $\sqrt{a}$ ?</span>
+      On teste si $a$ est un <b>carré parfait</b> : $\sqrt{9}=3$ → rationnel ; $\sqrt{7}$ n'est pas un entier → irrationnel.
+    </div>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i class="on"></i><i></i><i></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f2" id="f2p2" data-hud="Fiche 2 · 2/4 · Je retiens">
+  <div class="ctag">FICHE 02</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 02 · Rationnels, irrationnels &amp; $\mathbb{R}$</p>
+    <h2 class="ptype rv" style="--d:.05s">Je <span class="u">retiens</span></h2>
+    <p class="sub rv" style="--d:.1s">Les inclusions entre ensembles de nombres :</p>
+    <div class="chain rv" style="--d:.2s">
+      <span class="ens">$\mathbb{N}$</span><span class="sub-s">⊂</span>
+      <span class="ens">$\mathbb{Z}$</span><span class="sub-s">⊂</span>
+      <span class="ens">$\mathbb{D}$</span><span class="sub-s">⊂</span>
+      <span class="ens">$\mathbb{Q}$</span><span class="sub-s">⊂</span>
+      <span class="ens">$\mathbb{R}$</span>
+    </div>
+    <div class="legend rv" style="--d:.3s">
+      <span><b>ℕ</b> entiers naturels : $0;1;2;\ldots$</span>
+      <span><b>ℤ</b> entiers relatifs : $\ldots;-2;-1;0;1;\ldots$</span>
+      <span><b>𝔻</b> décimaux : $6{,}4$ ; $-0{,}75$</span>
+      <span><b>ℚ</b> rationnels (fractions)</span>
+      <span style="grid-column:1/-1"><b>ℝ</b> tous les nombres réels (rationnels + irrationnels)</span>
+    </div>
+    <div class="exemple rv" style="--d:.4s">
+      <span class="tag">EXEMPLES</span>
+      $\sqrt{144}=12\in\mathbb{Z}$ → rationnel · $\sqrt{2}$ → irrationnel · $6{,}4=\frac{32}{5}$ → décimal donc rationnel.
+    </div>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i></i><i class="on"></i><i></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f2" id="f2p3" data-hud="Fiche 2 · 3/4 · Le piège">
+  <div class="ctag" style="background:#C8371F">⚠ PIÈGE</div>
+  <div class="card"><div class="hazard"></div><div class="card-in">
+    <p class="eyebrow rv">Fiche 02 · Rationnels, irrationnels &amp; $\mathbb{R}$</p>
+    <h2 class="ptype rv" style="--d:.05s">Le piège <span class="warn-u">classique</span></h2>
+    <div class="vs rv" style="--d:.15s">
+      <span class="stamp">PIÈGE !</span>
+      <div class="bad"><span class="t">✗ FAUX — « il y a un radical, donc c'est irrationnel »</span>
+        $\sqrt{16}$ serait irrationnel à cause du signe $\sqrt{\phantom{0}}$ ? Non !</div>
+      <div class="good"><span class="t">✓ VRAI — on vérifie d'abord si $a$ est un carré parfait</span>
+        $\sqrt{16}=4=\dfrac{4}{1}$ : c'est un <b>rationnel</b>. Le radical ne fait pas tout.</div>
+    </div>
+    <p class="regle rv" style="--d:.3s"><strong>Réflexe :</strong> avant de classer $\sqrt{a}$, on cherche si $a$ est un carré parfait. Si oui → $\sqrt{a}$ est un entier, donc <b>rationnel</b>. Sinon → <b>irrationnel</b>.</p>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i></i><i></i><i class="on"></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f2" id="f2p4" data-hud="Fiche 2 · 4/4 · Mini-quiz">
+  <div class="ctag">FICHE 02</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 02 · Rationnels, irrationnels &amp; $\mathbb{R}$</p>
+    <h2 class="ptype rv" style="--d:.05s">Mini-<span class="u">quiz</span> 2</h2>
+    <div class="quiz-top rv" style="--d:.1s">
+      <span class="qcount">5 QUESTIONS · 1 PT CHACUNE</span>
+      <button class="allbtn" data-on="0">Tout afficher</button>
+    </div>
+    <div class="q rv" style="--d:.15s"><div class="q-top"><span class="qn">Q1</span><p class="q-txt">Classe chaque nombre — rationnel ou irrationnel : $\sqrt{9}$ ; $\sqrt{7}$ ; $-4$ ; $\pi$.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$\sqrt{9}=3$ → rationnel · $\sqrt{7}$ → irrationnel · $-4$ → rationnel · $\pi$ → irrationnel.</p></div></div></div>
+    <div class="q rv" style="--d:.2s"><div class="q-top"><span class="qn">Q2</span><p class="q-txt">Complète : $\mathbb{N}\subset\ldots\subset\mathbb{D}\subset\ldots\subset\mathbb{R}$.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$\mathbb{N}\subset\mathbb{Z}\subset\mathbb{D}\subset\mathbb{Q}\subset\mathbb{R}$.</p></div></div></div>
+    <div class="q rv" style="--d:.25s"><div class="q-top"><span class="qn">Q3</span><p class="q-txt">Vrai ou Faux : $6{,}4$ est un nombre décimal, donc rationnel.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in"><b>Vrai.</b> $6{,}4=\frac{64}{10}=\frac{32}{5}$ : tout décimal est rationnel ($\mathbb{D}\subset\mathbb{Q}$).</p></div></div></div>
+    <div class="q rv" style="--d:.3s"><div class="q-top"><span class="qn">Q4</span><p class="q-txt">Sans calculatrice : $\sqrt{144}$ est-il rationnel ou irrationnel ? Justifie.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">Rationnel, car $144=12^2$ est un carré parfait, donc $\sqrt{144}=12\in\mathbb{Z}\subset\mathbb{Q}$.</p></div></div></div>
+    <div class="q rv" style="--d:.35s"><div class="q-top"><span class="qn">Q5</span><p class="q-txt">Donne un exemple d'irrationnel contenant une racine carrée.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">Par exemple $\sqrt{2}$, $\sqrt{3}$, $-\sqrt{5}$, $\sqrt{10}$… toute racine d'un entier qui n'est pas un carré parfait.</p></div></div></div>
+    <div class="pfoot"><span class="src">Objectif : 5/5</span><span class="pdots"><i></i><i></i><i></i><i class="on"></i></span></div>
+  </div></div>
+</section>
+
+<!-- ═══════════ FICHE 3 ═══════════ -->
+<section class="page f3" id="f3p1" data-hud="Fiche 3 · 1/4 · Je découvre">
+  <div class="ctag">FICHE 03</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 03 · Propriétés des radicaux</p>
+    <h2 class="ptype rv" style="--d:.05s">Je <span class="u">découvre</span></h2>
+    <p class="sub rv" style="--d:.1s">Les 3 propriétés fondamentales ($a$ et $b$ positifs ou nuls) :</p>
+    <div class="props rv" style="--d:.2s">
+      <div class="prop"><span class="lbl">PRODUIT</span><span class="fx">$\sqrt{a}\times\sqrt{b}=\sqrt{a\times b}$</span></div>
+      <div class="prop"><span class="lbl">QUOTIENT</span><span class="fx">$\dfrac{\sqrt{a}}{\sqrt{b}}=\sqrt{\dfrac{a}{b}}\quad(b\neq 0)$</span></div>
+      <div class="prop"><span class="lbl">FACTEUR CARRÉ</span><span class="fx">$\sqrt{a^2\times b}=a\sqrt{b}\quad(a\geqslant 0)$</span></div>
+    </div>
+    <div class="exemple rv" style="--d:.3s">
+      <span class="tag">EN ACTION</span>
+      $\sqrt{3}\times\sqrt{5}=\sqrt{15}$ · $\sqrt{4^2\times 3}=4\sqrt{3}$ · $\sqrt{a}\times\sqrt{a}=a$.
+    </div>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i class="on"></i><i></i><i></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f3" id="f3p2" data-hud="Fiche 3 · 2/4 · Je retiens">
+  <div class="ctag">FICHE 03</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 03 · Propriétés des radicaux</p>
+    <h2 class="ptype rv" style="--d:.05s">Je <span class="u">retiens</span></h2>
+    <p class="sub rv" style="--d:.1s">Comment vérifier un Vrai / Faux sur les radicaux ?</p>
+    <div class="methode rv" style="display:flex;flex-direction:column;gap:9px">
+      <div class="meth"><span class="n">1</span><span>On teste avec des <b>valeurs simples</b> : $a=9$ et $b=16$ suffisent souvent.</span></div>
+      <div class="meth"><span class="n">2</span><span>Un seul <b>contre-exemple chiffré</b> prouve qu'une formule est fausse.</span></div>
+    </div>
+    <div class="exemple rv" style="--d:.25s">
+      <span class="tag">EXEMPLE</span>
+      « $\sqrt{a+b}=\sqrt{a}+\sqrt{b}$ » est <b>FAUX</b> : $\sqrt{9+16}=\sqrt{25}=5$, alors que $\sqrt{9}+\sqrt{16}=3+4=7$. Et $5\neq 7$.
+    </div>
+    <p class="regle rv" style="--d:.35s"><strong>Réflexe :</strong> avant d'utiliser une formule, on la teste sur un cas numérique simple.</p>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i></i><i class="on"></i><i></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f3" id="f3p3" data-hud="Fiche 3 · 3/4 · Le piège">
+  <div class="ctag" style="background:#C8371F">⚠ PIÈGE</div>
+  <div class="card"><div class="hazard"></div><div class="card-in">
+    <p class="eyebrow rv">Fiche 03 · Propriétés des radicaux</p>
+    <h2 class="ptype rv" style="--d:.05s">Le piège <span class="warn-u">classique</span></h2>
+    <div class="vs rv" style="--d:.15s">
+      <span class="stamp">PIÈGE !</span>
+      <div class="bad"><span class="t">✗ FAUX — la racine d'une somme</span>
+        $\sqrt{9+16}=\sqrt{9}+\sqrt{16}=3+4=7$ ? Non : $\sqrt{9+16}=\sqrt{25}=5$, et $5\neq 7$.</div>
+      <div class="good"><span class="t">✓ CE QUI EST VRAI</span>
+        Les formules du <b>produit</b> et du <b>quotient</b> seulement : $\sqrt{a\times b}=\sqrt{a}\times\sqrt{b}$ et $\dfrac{\sqrt{a}}{\sqrt{b}}=\sqrt{\dfrac{a}{b}}$.</div>
+    </div>
+    <p class="regle rv" style="--d:.3s"><strong>Il n'existe aucune formule</strong> pour $\sqrt{a+b}$ ni pour $\sqrt{a-b}$ :<br>
+    $\boxed{\;\sqrt{a+b}\neq\sqrt{a}+\sqrt{b}\;}\qquad\boxed{\;\sqrt{a-b}\neq\sqrt{a}-\sqrt{b}\;}$</p>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i></i><i></i><i class="on"></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f3" id="f3p4" data-hud="Fiche 3 · 4/4 · Mini-quiz">
+  <div class="ctag">FICHE 03</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 03 · Propriétés des radicaux</p>
+    <h2 class="ptype rv" style="--d:.05s">Mini-<span class="u">quiz</span> 3</h2>
+    <div class="quiz-top rv" style="--d:.1s">
+      <span class="qcount">5 QUESTIONS · 1 PT CHACUNE</span>
+      <button class="allbtn" data-on="0">Tout afficher</button>
+    </div>
+    <div class="q rv" style="--d:.15s"><div class="q-top"><span class="qn">Q1</span><p class="q-txt">Calcule : $\sqrt{3}\times\sqrt{5}$.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$\sqrt{3}\times\sqrt{5}=\sqrt{3\times 5}=\sqrt{15}$.</p></div></div></div>
+    <div class="q rv" style="--d:.2s"><div class="q-top"><span class="qn">Q2</span><p class="q-txt">Vrai ou Faux : $\sqrt{9+16}=\sqrt{9}+\sqrt{16}$. Corrige si nécessaire.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in"><b>Faux.</b> $\sqrt{9+16}=\sqrt{25}=5$, alors que $\sqrt{9}+\sqrt{16}=3+4=7$ ; $5\neq 7$.</p></div></div></div>
+    <div class="q rv" style="--d:.25s"><div class="q-top"><span class="qn">Q3</span><p class="q-txt">Vrai ou Faux : $\sqrt{4^2\times 3}=4\sqrt{3}$.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in"><b>Vrai.</b> $\sqrt{4^2\times 3}=\sqrt{16\times 3}=\sqrt{48}=4\sqrt{3}$ (propriété $\sqrt{a^2 b}=a\sqrt{b}$).</p></div></div></div>
+    <div class="q rv" style="--d:.3s"><div class="q-top"><span class="qn">Q4</span><p class="q-txt">Complète avec $\neq$ ou $=$ : $\sqrt{a+b}\;\ldots\;\sqrt{a}+\sqrt{b}$.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$\sqrt{a+b}\neq\sqrt{a}+\sqrt{b}$ : aucune formule pour la racine d'une somme.</p></div></div></div>
+    <div class="q rv" style="--d:.35s"><div class="q-top"><span class="qn">Q5</span><p class="q-txt">Vrai ou Faux : $\sqrt{a}\times\sqrt{a}=a$ (pour $a\geqslant 0$).</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in"><b>Vrai.</b> $\sqrt{a}\times\sqrt{a}=\sqrt{a\times a}=\sqrt{a^2}=a$ (car $a\geqslant 0$).</p></div></div></div>
+    <div class="pfoot"><span class="src">Objectif : 5/5</span><span class="pdots"><i></i><i></i><i></i><i class="on"></i></span></div>
+  </div></div>
+</section>
+
+<!-- ═══════════ FICHE 4 ═══════════ -->
+<section class="page f4" id="f4p1" data-hud="Fiche 4 · 1/4 · Je découvre">
+  <div class="ctag">FICHE 04</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 04 · Simplification &amp; conjugué</p>
+    <h2 class="ptype rv" style="--d:.05s">Je <span class="u">découvre</span></h2>
+    <div class="methode rv" style="display:flex;flex-direction:column;gap:9px">
+      <div class="meth"><span class="n">1</span><span>On cherche un <b>carré parfait caché</b> sous le radical : $\sqrt{75}=\sqrt{25\times 3}=5\sqrt{3}$.</span></div>
+      <div class="meth"><span class="n">2</span><span>Pour les sommes, on <b>regroupe</b> les radicaux identiques : $b\sqrt{a}+c\sqrt{a}=(b+c)\sqrt{a}$.</span></div>
+    </div>
+    <div class="exemple rv" style="--d:.25s">
+      <span class="tag">EXEMPLE GUIDÉ</span>
+      $A=\sqrt{200}-\sqrt{50}+6\sqrt{2}$<br>
+      $A=10\sqrt{2}-5\sqrt{2}+6\sqrt{2}$<br>
+      $A=(10-5+6)\sqrt{2}=\mathbf{11\sqrt{2}}$
+    </div>
+    <p class="note rv" style="--d:.35s">On traite les radicaux identiques comme des « $x$ » : ce sont des coefficients qu'on additionne.</p>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i class="on"></i><i></i><i></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f4" id="f4p2" data-hud="Fiche 4 · 2/4 · Je retiens">
+  <div class="ctag">FICHE 04</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 04 · Simplification &amp; conjugué</p>
+    <h2 class="ptype rv" style="--d:.05s">Je <span class="u">retiens</span></h2>
+    <div class="duo rv" style="--d:.15s">
+      <div class="memocard"><div class="fx">$\sqrt{a}+\sqrt{b}\;\leftrightarrow\;\sqrt{a}-\sqrt{b}$</div><small>Le <b>conjugué</b> : on change le signe entre les deux termes.</small></div>
+      <div class="memocard"><div class="fx">$(x-y)(x+y)=x^2-y^2$</div><small>L'identité qui <b>élimine les racines</b> au dénominateur.</small></div>
+    </div>
+    <div class="exemple rv" style="--d:.3s">
+      <span class="tag">RATIONALISER</span>
+      $\dfrac{-7}{\sqrt{3}}=\dfrac{-7\sqrt{3}}{3}$<br><br>
+      $\dfrac{\sqrt{2}+1}{\sqrt{2}-1}=\dfrac{(\sqrt{2}+1)^2}{2-1}=3+2\sqrt{2}$
+    </div>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i></i><i class="on"></i><i></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f4" id="f4p3" data-hud="Fiche 4 · 3/4 · Le piège">
+  <div class="ctag" style="background:#C8371F">⚠ PIÈGE</div>
+  <div class="card"><div class="hazard"></div><div class="card-in">
+    <p class="eyebrow rv">Fiche 04 · Simplification &amp; conjugué</p>
+    <h2 class="ptype rv" style="--d:.05s">Le piège <span class="warn-u">classique</span></h2>
+    <div class="vs rv" style="--d:.15s">
+      <span class="stamp">PIÈGE !</span>
+      <div class="bad"><span class="t">✗ FAUX — on ne « fusionne » pas les termes</span>
+        $3+\sqrt{5}=3\sqrt{5}$ ? Non. &nbsp;Et $\sqrt{2}+\sqrt{3}=\sqrt{5}$ ? Non plus !</div>
+      <div class="good"><span class="t">✓ VRAI — seuls les radicaux identiques se regroupent</span>
+        $3\sqrt{2}+\sqrt{2}=4\sqrt{2}$ · mais $3+\sqrt{5}$ reste tel quel.</div>
+    </div>
+    <p class="regle rv" style="--d:.3s"><strong>Règle :</strong> on additionne uniquement des multiples du <b>même</b> radical, comme des « $x$ ». Un entier et une racine ne se combinent jamais : $2+\sqrt{3}\neq 2\sqrt{3}$.</p>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i></i><i></i><i class="on"></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f4" id="f4p4" data-hud="Fiche 4 · 4/4 · Mini-quiz">
+  <div class="ctag">FICHE 04</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 04 · Simplification &amp; conjugué</p>
+    <h2 class="ptype rv" style="--d:.05s">Mini-<span class="u">quiz</span> 4</h2>
+    <div class="quiz-top rv" style="--d:.1s">
+      <span class="qcount">5 QUESTIONS · 1 PT CHACUNE</span>
+      <button class="allbtn" data-on="0">Tout afficher</button>
+    </div>
+    <div class="q rv" style="--d:.15s"><div class="q-top"><span class="qn">Q1</span><p class="q-txt">Simplifie : $\sqrt{75}$.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$\sqrt{75}=\sqrt{25\times 3}=5\sqrt{3}$.</p></div></div></div>
+    <div class="q rv" style="--d:.2s"><div class="q-top"><span class="qn">Q2</span><p class="q-txt">Calcule : $3\sqrt{2}+5\sqrt{2}-\sqrt{2}$.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$3\sqrt{2}+5\sqrt{2}-\sqrt{2}=(3+5-1)\sqrt{2}=7\sqrt{2}$.</p></div></div></div>
+    <div class="q rv" style="--d:.25s"><div class="q-top"><span class="qn">Q3</span><p class="q-txt">Quel est le conjugué de $\sqrt{7}-3$ ?</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">Le conjugué de $\sqrt{7}-3$ est $\sqrt{7}+3$.</p></div></div></div>
+    <div class="q rv" style="--d:.3s"><div class="q-top"><span class="qn">Q4</span><p class="q-txt">Rends le dénominateur rationnel : $\dfrac{5}{\sqrt{3}}$.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$\dfrac{5}{\sqrt{3}}=\dfrac{5\times\sqrt{3}}{\sqrt{3}\times\sqrt{3}}=\dfrac{5\sqrt{3}}{3}$.</p></div></div></div>
+    <div class="q rv" style="--d:.35s"><div class="q-top"><span class="qn">Q5</span><p class="q-txt">Simplifie : $\sqrt{50}-\sqrt{8}$ (indice : $\sqrt{50}=5\sqrt{2}$ et $\sqrt{8}=2\sqrt{2}$).</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$\sqrt{50}-\sqrt{8}=5\sqrt{2}-2\sqrt{2}=3\sqrt{2}$.</p></div></div></div>
+    <div class="pfoot"><span class="src">Objectif : 5/5</span><span class="pdots"><i></i><i></i><i></i><i class="on"></i></span></div>
+  </div></div>
+</section>
+
+<!-- ═══════════ FICHE 5 ═══════════ -->
+<section class="page f5" id="f5p1" data-hud="Fiche 5 · 1/4 · Je découvre">
+  <div class="ctag">FICHE 05</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 05 · Comparaison &amp; encadrement</p>
+    <h2 class="ptype rv" style="--d:.05s">Je <span class="u">découvre</span></h2>
+    <div class="def rv" style="--d:.15s">
+      <span class="tag">COMPARER PAR LES CARRÉS</span>
+      Pour comparer deux réels <b>positifs</b>, on compare leurs carrés : si $x^2 > y^2$, alors $x > y$.
+    </div>
+    <div class="exemple rv" style="--d:.25s">
+      <span class="tag">EXEMPLES</span>
+      $2^2=4<5=(\sqrt{5})^2$ → $2<\sqrt{5}$<br>
+      $3^2=9>7=(\sqrt{7})^2$ → $3>\sqrt{7}$, donc $3-\sqrt{7}>0$.
+    </div>
+    <div class="tuiles rv" style="--d:.35s">
+      <div class="tuile"><b>$1$</b><span>$\sqrt{1}$<br>parfait</span></div>
+      <div class="tuile"><b>$\sqrt{2}$</b><span>$\approx 1{,}414$<br>irrationnel</span></div>
+      <div class="tuile"><b>$\sqrt{3}$</b><span>$\approx 1{,}732$<br>irrationnel</span></div>
+      <div class="tuile"><b>$2$</b><span>$\sqrt{4}$<br>parfait</span></div>
+      <div class="tuile"><b>$\sqrt{5}$</b><span>$\approx 2{,}236$<br>irrationnel</span></div>
+    </div>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i class="on"></i><i></i><i></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f5" id="f5p2" data-hud="Fiche 5 · 2/4 · Je retiens">
+  <div class="ctag">FICHE 05</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 05 · Comparaison &amp; encadrement</p>
+    <h2 class="ptype rv" style="--d:.05s">Je <span class="u">retiens</span></h2>
+    <div class="memocard rv" style="--d:.15s"><div class="fx">$\sqrt{a^2}=\lvert a\rvert$</div><small>Pour <b>tout</b> réel $a$ — les fiches 1 et 5 se rejoignent : si $a\geqslant 0$, $\sqrt{a^2}=a$.</small></div>
+    <div class="duo rv" style="--d:.25s">
+      <div class="def"><span class="tag">SI $a\geqslant 0$</span>$\lvert a\rvert = a$</div>
+      <div class="def"><span class="tag">SI $a<0$</span>$\lvert a\rvert = -a$</div>
+    </div>
+    <div class="exemple rv" style="--d:.35s">
+      <span class="tag">EXEMPLE</span>
+      $\sqrt{(-7)^2}=\lvert -7\rvert = 7$
+    </div>
+    <p class="regle rv" style="--d:.45s"><strong>Règle d'or de l'encadrement ⚠ :</strong> si on multiplie un encadrement par un nombre <b>négatif</b>, on <b>inverse</b> le sens des inégalités.</p>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i></i><i class="on"></i><i></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f5" id="f5p3" data-hud="Fiche 5 · 3/4 · Le piège">
+  <div class="ctag" style="background:#C8371F">⚠ PIÈGE</div>
+  <div class="card"><div class="hazard"></div><div class="card-in">
+    <p class="eyebrow rv">Fiche 05 · Comparaison &amp; encadrement</p>
+    <h2 class="ptype rv" style="--d:.05s">Le piège <span class="warn-u">classique</span></h2>
+    <div class="vs rv" style="--d:.15s">
+      <span class="stamp">PIÈGE !</span>
+      <div class="bad"><span class="t">✗ FAUX — $\sqrt{a^2}=a$ n'est pas toujours vrai</span>
+        $\sqrt{(-7)^2}=-7$ ? Impossible : une racine carrée est toujours $\geqslant 0$ !</div>
+      <div class="good"><span class="t">✓ VRAI — on passe par la valeur absolue</span>
+        $\sqrt{(-7)^2}=\lvert -7\rvert = 7$. En général : $\sqrt{a^2}=\lvert a\rvert$.</div>
+    </div>
+    <p class="regle rv" style="--d:.3s"><strong>À retenir :</strong> $\sqrt{a^2}=a$ seulement si $a\geqslant 0$. Dans le doute, écris toujours $\boxed{\;\sqrt{a^2}=\lvert a\rvert\;}$.</p>
+    <div class="pfoot"><span class="src">Racines carrées · 3ᵉ</span><span class="pdots"><i></i><i></i><i class="on"></i><i></i></span></div>
+  </div></div>
+</section>
+
+<section class="page f5" id="f5p4" data-hud="Fiche 5 · 4/4 · Mini-quiz">
+  <div class="ctag">FICHE 05</div>
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Fiche 05 · Comparaison &amp; encadrement</p>
+    <h2 class="ptype rv" style="--d:.05s">Mini-<span class="u">quiz</span> 5</h2>
+    <div class="quiz-top rv" style="--d:.1s">
+      <span class="qcount">4 QUESTIONS · 1 PT CHACUNE</span>
+      <button class="allbtn" data-on="0">Tout afficher</button>
+    </div>
+    <div class="q rv" style="--d:.15s"><div class="q-top"><span class="qn">Q1</span><p class="q-txt">Simplifie : $\sqrt{(-9)^2}$.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$\sqrt{(-9)^2}=\lvert -9\rvert = 9$.</p></div></div></div>
+    <div class="q rv" style="--d:.2s"><div class="q-top"><span class="qn">Q2</span><p class="q-txt">Compare $4$ et $\sqrt{15}$ en comparant leurs carrés. Conclus.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$4^2=16$ et $(\sqrt{15})^2=15$. Comme $16>15$, alors $4>\sqrt{15}$.</p></div></div></div>
+    <div class="q rv" style="--d:.25s"><div class="q-top"><span class="qn">Q3</span><p class="q-txt">Détermine le signe de $5-\sqrt{20}$ (positif, négatif ou nul). Justifie.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$5^2=25$ et $(\sqrt{20})^2=20$. Comme $25>20$, alors $5>\sqrt{20}$, donc $5-\sqrt{20}>0$ : <b>positif</b>.</p></div></div></div>
+    <div class="q rv" style="--d:.3s"><div class="q-top"><span class="qn">Q4</span><p class="q-txt">Encadre $2\sqrt{5}-3$ à $0{,}1$ près sachant que $2{,}236<\sqrt{5}<2{,}237$.</p></div>
+      <button class="rev" aria-expanded="false"><span>Voir la réponse</span></button>
+      <div class="ans"><div><p class="ans-in">$2{,}236<\sqrt{5}<2{,}237$ → $4{,}472<2\sqrt{5}<4{,}474$ → $1{,}472<2\sqrt{5}-3<1{,}474$, donc à $0{,}1$ près : $1{,}4<2\sqrt{5}-3<1{,}5$.</p></div></div></div>
+    <div class="pfoot"><span class="src">Objectif : 4/4</span><span class="pdots"><i></i><i></i><i></i><i class="on"></i></span></div>
+  </div></div>
+</section>
+
+<!-- ═══════════ BARÈME ═══════════ -->
+<section class="page end" id="pend" data-hud="Barème & objectif">
+  <div class="card"><div class="card-in">
+    <p class="eyebrow rv">Épilogue</p>
+    <h2 class="ptype rv" style="--d:.05s">Objectif<br>20 / 20</h2>
+    <div class="stars rv" style="--d:.1s" aria-hidden="true"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+    <div class="bareme rv" style="--d:.25s">
+      <p><b>Barème conseillé :</b> 1 point par question.</p>
+      <p><b>Un quiz raté ?</b> Revoir la section « Je retiens » de la fiche correspondante…</p>
+      <p><b>…puis refaire le quiz</b> le lendemain. La répétition espacée fait tout.</p>
+    </div>
+    <a class="restart rv" style="--d:.4s" href="#p0">↺ &nbsp;Recommencer les fiches</a>
+    <p class="credit rv" style="--d:.5s;color:rgba(25,23,18,.6)">D'après les Mini-Fiches de Découverte de Mouhamadou Lamine WADE · Niveau 3ᵉ · Mathématiques — Activités numériques</p>
+    <div class="pfoot" style="border-color:rgba(25,23,18,.4)"><span class="src">Les Racines Carrées</span><span class="pdots"><i class="on" style="background:var(--ink)"></i></span></div>
+  </div></div>
+</section>
+
+</main>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+ onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<script>
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var pages = Array.prototype.slice.call(document.querySelectorAll('.page'));
+  var rail  = Array.prototype.slice.call(document.querySelectorAll('.rail a'));
+  var hud   = document.getElementById('hudText');
+  var dot   = document.querySelector('.hud-dot');
+  var bar   = document.getElementById('pbar');
+  var cur = 0;
+
+  /* pages traversées → HUD + rail + révélations */
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(!en.isIntersecting) return;
+      var i = pages.indexOf(en.target);
+      if(i < 0) return;
+      cur = i;
+      en.target.classList.add('live');
+      rail.forEach(function(a,j){ a.classList.toggle('on', j===i); });
+      hud.textContent = en.target.dataset.hud || '';
+      var acc = getComputedStyle(en.target).getPropertyValue('--acc').trim() || '#F2B705';
+      dot.style.background = acc;
+    });
+  },{rootMargin:'-42% 0px -42% 0px', threshold:0});
+  pages.forEach(function(p){ io.observe(p); });
+
+  /* barre de progression */
+  addEventListener('scroll', function(){
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    bar.style.width = (max>0 ? (h.scrollTop/max)*100 : 0) + '%';
+  }, {passive:true});
+
+  /* navigation */
+  function go(d){
+    var n = Math.min(pages.length-1, Math.max(0, cur+d));
+    pages[n].scrollIntoView({behavior: reduce?'auto':'smooth', block:'start'});
+  }
+  document.getElementById('prev').addEventListener('click', function(){ go(-1); });
+  document.getElementById('next').addEventListener('click', function(){ go(1); });
+  addEventListener('keydown', function(e){
+    if(['ArrowDown','ArrowRight','PageDown'].indexOf(e.key)>-1){ e.preventDefault(); go(1); }
+    if(['ArrowUp','ArrowLeft','PageUp'].indexOf(e.key)>-1){ e.preventDefault(); go(-1); }
+  });
+
+  /* réponses des quiz */
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('.rev');
+    if(b){
+      var q = b.closest('.q');
+      var open = q.classList.toggle('open');
+      b.setAttribute('aria-expanded', open);
+      b.querySelector('span').textContent = open ? 'Masquer' : 'Voir la réponse';
+      return;
+    }
+    var all = e.target.closest('.allbtn');
+    if(all){
+      var page = all.closest('.page');
+      var hide = all.dataset.on === '1';
+      page.querySelectorAll('.q').forEach(function(q){
+        q.classList.toggle('open', !hide);
+        var btn = q.querySelector('.rev');
+        btn.setAttribute('aria-expanded', String(!hide));
+        btn.querySelector('span').textContent = !hide ? 'Masquer' : 'Voir la réponse';
+      });
+      all.dataset.on = hide ? '0' : '1';
+      all.textContent = hide ? 'Tout afficher' : 'Tout masquer';
+    }
+  });
+})();
+</script>
+</body>
+</html>
